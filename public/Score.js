@@ -1,9 +1,12 @@
-import {sendEvent} from './socket.js';
+import { sendEvent } from './socket.js';
+import stageData from './assets/stage.json' with { type: 'json' };
 
 class Score {
   score = 0;
   HIGH_SCORE_KEY = 'highScore';
   stageChange = true;
+  currentStage = 0;
+  stage = 0;
 
   constructor(ctx, scaleRatio) {
     this.ctx = ctx;
@@ -12,11 +15,22 @@ class Score {
   }
 
   update(deltaTime) {
-    this.score += deltaTime * 0.001;
-    // 점수가 10점 이상이 될 시 서버에 메세지 전송
-    if (Math.floor(this.score) === 10 && this.stageChange) {
-      this.stageChange = false;
-      sendEvent(11, { currentStage: 1000, targetStage: 1001 });
+    this.score += deltaTime * 0.001 * stageData.data[this.currentStage].scorePerSecond;
+    if (this.currentStage ===6){
+      return;
+    }
+    // Check if the player has achieved the score required to advance to the next stage
+    if (Math.floor(this.score) === stageData.data[this.currentStage + 1].score) {
+      this.stageChange = false; // Prevent further stage changes until the current one is processed
+      console.log(`Stage ${this.currentStage + 1} Clear`);
+
+      // Send event to the server with current and target stage information
+      sendEvent(11, {
+        currentStage: stageData.data[this.currentStage].id,
+        targetStage: stageData.data[this.currentStage + 1].id,
+      });
+      // Move to the next stage
+      this.currentStage++;
     }
   }
 
@@ -26,6 +40,7 @@ class Score {
 
   reset() {
     this.score = 0;
+    this.currentStage =0;
   }
 
   setHighScore() {

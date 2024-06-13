@@ -5,8 +5,7 @@ class Score {
   score = 0;
   HIGH_SCORE_KEY = 'highScore';
   stageChange = true;
-  currentStage = 0;
-  stage = 0;
+  currentStageIndex = 0; // Use an index to access stages in the array
 
   constructor(ctx, scaleRatio) {
     this.ctx = ctx;
@@ -14,33 +13,37 @@ class Score {
     this.scaleRatio = scaleRatio;
   }
 
-  update(deltaTime) {
-    this.score += deltaTime * 0.001 * stageData.data[this.currentStage].scorePerSecond;
-    if (this.currentStage ===6){
+  update(deltaTime) {  
+    // Increment the score based on deltaTime and the scorePerSecond of the current stage
+    this.score += deltaTime * 0.001 * stageData.data[this.currentStageIndex].scorePerSecond;
+  
+    // Check if the current stage is the last one
+    if (this.currentStageIndex === stageData.data.length - 1) {
       return;
     }
+  
     // Check if the player has achieved the score required to advance to the next stage
-    if (Math.floor(this.score) === stageData.data[this.currentStage + 1].score) {
-      this.stageChange = false; // Prevent further stage changes until the current one is processed
-      console.log(`Stage ${this.currentStage + 1} Clear`);
-
+    if (this.score >= stageData.data[this.currentStageIndex + 1].score) {
+      console.log(`Stage ${this.currentStageIndex + 1} Clear`);
+  
       // Send event to the server with current and target stage information
       sendEvent(11, {
-        currentStage: stageData.data[this.currentStage].id,
-        targetStage: stageData.data[this.currentStage + 1].id,
+        currentStage: stageData.data[this.currentStageIndex].id,
+        targetStage: stageData.data[this.currentStageIndex + 1].id,
       });
+  
       // Move to the next stage
-      this.currentStage++;
+      this.currentStageIndex++;
     }
   }
 
   getItem(itemId) {
-    this.score += 0;
+    this.score += 0; // Placeholder for item collection logic
   }
 
   reset() {
-    this.score = 0;
-    this.currentStage =0;
+    this.score = 0; // Reset score
+    this.currentStageIndex = 0; // Reset to initial stage index
   }
 
   setHighScore() {

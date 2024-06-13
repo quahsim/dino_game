@@ -1,11 +1,16 @@
 import { sendEvent } from './socket.js';
 import stageData from './assets/stage.json' with { type: 'json' };
+import itemData from './assets/item.json' with { type: 'json' };
+import itemUnlocksData from './assets/item_unlock.json' with { type: 'json' };
+
 
 class Score {
   score = 0;
   HIGH_SCORE_KEY = 'highScore';
   stageChange = true;
-  currentStageIndex = 0; // Use an index to access stages in the array
+  currentStageIndex = 0; 
+
+  //setCurrentStageIndex (index함수...)
 
   constructor(ctx, scaleRatio) {
     this.ctx = ctx;
@@ -38,7 +43,37 @@ class Score {
   }
 
   getItem(itemId) {
-    this.score += 0; // Placeholder for item collection logic
+    const currentStage = stageData.data[this.currentStageIndex].id; // Use currentStageIndex to get current stage
+
+    // Find the item in the item data
+    const item = itemData.data.find(item => item.id === itemId);
+    if (!item) {
+      console.error(`Item with ID ${itemId} not found`);
+      return;
+    }
+
+    // Debugging: Log currentStage and item details
+    console.log(`Current Stage: ${currentStage}, Item ID: ${itemId}, Item Score: ${item.score}`);
+    this.score +=item.score;
+
+    // Check if the item can be unlocked in the current stage
+    const stageUnlockData = itemUnlocksData.data.find(data => data.stage_id === currentStage);
+    console.log(`New Items:`, stageUnlockData); // 
+
+    if (!stageUnlockData || !stageUnlockData.item_id.includes(itemId)) {
+      console.log('Item cannot be unlocked in this stage',itemId,currentStage);
+      return { status: 'fail', message: 'Item cannot be unlocked in this stage' };
+    }
+
+    // Send event to the server with the item information
+    sendEvent(12, {
+      currentStage,
+      itemId,
+      itemScore: item.score,
+    });
+
+    // Add the item's score to the total score
+    this.score += item.score;
   }
 
   reset() {

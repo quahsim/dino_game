@@ -40,6 +40,8 @@ const ITEM_CONFIG = [
   { width: 50 / 1.5, height: 50 / 1.5, id: 2, image: 'images/items/pokeball_yellow.png' },
   { width: 50 / 1.5, height: 50 / 1.5, id: 3, image: 'images/items/pokeball_purple.png' },
   { width: 50 / 1.5, height: 50 / 1.5, id: 4, image: 'images/items/pokeball_cyan.png' },
+  { width: 50 / 1.5, height: 50 / 1.5, id: 5, image: 'images/items/pokeball_orange.png' },
+  { width: 50 / 1.5, height: 50 / 1.5, id: 6, image: 'images/items/pokeball_pink.png' },
 ];
 
 // 게임 요소들
@@ -47,7 +49,7 @@ let player = null;
 let ground = null;
 let cactiController = null;
 let itemController = null;
-let score = null;
+export let score = null;
 
 let scaleRatio = null;
 let previousTime = null;
@@ -164,6 +166,7 @@ function reset() {
   cactiController.reset();
   score.reset();
   gameSpeed = GAME_SPEED_START;
+  itemController.reset();
   // 게임시작 핸들러ID 2, payload 에는 게임 시작 시간
   sendEvent(2, { timestamp: Date.now() });
 }
@@ -244,3 +247,11 @@ function gameLoop(currentTime) {
 requestAnimationFrame(gameLoop);
 
 window.addEventListener('keyup', reset, { once: true });
+
+// 테스트용 아이템 스포닝
+window.addEventListener("keyup", (e) => {
+  const n = +e.code.charAt(5);
+  if (n < 7 && n > 0) {
+    itemController.createItem();
+  }
+});

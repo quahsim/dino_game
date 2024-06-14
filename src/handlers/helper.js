@@ -1,4 +1,4 @@
-import { CLIENT_VERSION } from '../../constants.js';
+import { CLIENT_VERSION } from '../constants.js';
 import { createStage, setStage } from '../models/stage.model.js';
 import { createItem } from '../models/item.model.js';
 import { getUsers, removeUser } from '../models/users.model.js';

@@ -29,23 +29,21 @@ class ItemController {
   }
 
   createItem() {
-    // Get the current stage ID
     const currentStageId = itemUnlocksData.data[this.currentStageIndex].stage_id;
 
-    // Find the unlocked items for the current stage
+    // Find unlocked items for the current stage
     const stageItemsUnlock = itemUnlocksData.data.find((data) => data.stage_id === currentStageId);
 
-    // Get the IDs of the unlocked items
     const unlockedItemIds = stageItemsUnlock.item_id;
 
-    // Select a random item ID from the unlocked items
+    // Select random item ID from the unlocked items
     const index = this.getRandomNumber(0, unlockedItemIds.length - 1);
     const itemId = unlockedItemIds[index];
 
-    // Find the item information based on the selected item ID
+    // Find item information based on the selected item ID
     const itemInfo = this.itemImages.find((item) => item.id === itemId);
 
-    // Check if the item information is valid
+    // Check if item information is valid
     if (!itemInfo) {
       console.error('No item found with the given ID in itemImages.');
       return;

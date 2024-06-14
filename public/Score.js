@@ -3,14 +3,11 @@ import stageData from './assets/stage.json' with { type: 'json' };
 import itemData from './assets/item.json' with { type: 'json' };
 import itemUnlocksData from './assets/item_unlock.json' with { type: 'json' };
 
-
 class Score {
   score = 0;
   HIGH_SCORE_KEY = 'highScore';
   stageChange = true;
   currentStageIndex = 0; 
-
-  //setCurrentStageIndex (index함수...)
 
   constructor(ctx, scaleRatio) {
     this.ctx = ctx;
@@ -19,7 +16,6 @@ class Score {
   }
 
   update(deltaTime) {  
-    // Increment the score based on deltaTime and the scorePerSecond of the current stage
     this.score += deltaTime * 0.001 * stageData.data[this.currentStageIndex].scorePerSecond;
   
     // Check if the current stage is the last one
@@ -27,11 +23,10 @@ class Score {
       return;
     }
   
-    // Check if the player has achieved the score required to advance to the next stage
+    // Check if player has achieved the score required to advance to next stage
     if (this.score >= stageData.data[this.currentStageIndex + 1].score) {
       console.log(`Stage ${this.currentStageIndex + 1} Clear`);
   
-      // Send event to the server with current and target stage information
       sendEvent(11, {
         currentStage: stageData.data[this.currentStageIndex].id,
         targetStage: stageData.data[this.currentStageIndex + 1].id,
@@ -43,20 +38,18 @@ class Score {
   }
 
   getItem(itemId) {
-    const currentStage = stageData.data[this.currentStageIndex].id; // Use currentStageIndex to get current stage
+    const currentStage = stageData.data[this.currentStageIndex].id; 
 
-    // Find the item in the item data
+    // Find item in the item data
     const item = itemData.data.find(item => item.id === itemId);
     if (!item) {
       console.error(`Item with ID ${itemId} not found`);
       return;
     }
 
-    // Debugging: Log currentStage and item details
-    console.log(`Current Stage: ${currentStage}, Item ID: ${itemId}, Item Score: ${item.score}`);
     this.score +=item.score;
 
-    // Check if the item can be unlocked in the current stage
+    // Check if item can be unlocked in current stage
     const stageUnlockData = itemUnlocksData.data.find(data => data.stage_id === currentStage);
     console.log(`New Items:`, stageUnlockData); // 
 
@@ -65,7 +58,6 @@ class Score {
       return { status: 'fail', message: 'Item cannot be unlocked in this stage' };
     }
 
-    // Send event to the server with the item information
     sendEvent(12, {
       currentStage,
       itemId,
@@ -77,8 +69,8 @@ class Score {
   }
 
   reset() {
-    this.score = 0; // Reset score
-    this.currentStageIndex = 0; // Reset to initial stage index
+    this.score = 0; 
+    this.currentStageIndex = 0; 
   }
 
   setHighScore() {
